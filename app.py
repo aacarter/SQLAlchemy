@@ -36,16 +36,18 @@ def tobs():
     filter(Measurement.date >= '2016-08-23').order_by(Measurement.date.desc()).all()
     return jsonify(tobs_query)
 
+@app.route("/api/v1.0/<start>")
+def start_prec(start):
+    temp = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
+    filter(Measurement.date >= '2016-08-23').all()
+    return jsonify(temp)
+
 @app.route("/api/v1.0/<start>/<end>")
 def start_temps(start, end):
     
-        temp = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
+        temp_between = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
         filter(Measurement.date >= '2016-08-23').filter(Measurement.date <= '2017-08-23').all()
-        x = [a._asdict() for a in temp]
-        for t in x:
-            if t[start] == end:
-                return jsonify(t)
-
+        return jsonify(temp_between)
 
 if __name__ == '__main__':
    app.run(debug=True)
